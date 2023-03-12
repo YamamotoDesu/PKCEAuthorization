@@ -213,4 +213,5 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 ![image](https://user-images.githubusercontent.com/47273077/224525569-75f12819-96ee-4910-92da-194134c709da.png)
 
 * Finally, click CREATE. You should have an OAuth client definition for iOS as in the picture below:
+![image](https://user-images.githubusercontent.com/47273077/224525597-89d8b3f0-d092-4d1b-845f-fef075ad07b5.png)
 
