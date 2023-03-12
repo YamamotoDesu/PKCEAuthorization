@@ -88,3 +88,110 @@ private extension Data {
   }
 }
 ```
+
+
+Generating HTTP Requests
+In addition, the standard specifies two different endpoints on the Authorization server for the two authorization phases.
+
+Open PKCERequestBuilder.swift and note the properties for each of these endpoints at the top:
+
+Authorization endpoint at /authorize is in charge of emitting the authorization code grant.
+Token endpoint at /token-generation, to emit and refresh tokens.
+
+
+```swift
+import Foundation
+
+struct PKCERequestBuilder {
+  private let authorizationEndpointURL: String
+  private let tokenEndpointURL: String
+  private let clientId: String
+  private let redirectURI: String
+
+  // MARK: Authorization
+  /// Generates a URL with the required parameters for the authorization endpoint
+  /// https://datatracker.ietf.org/doc/html/rfc7636#section-4.3
+  func createAuthorizationRequestURL(codeChallenge: String) -> URL? {
+    guard var urlComponents = URLComponents(string: authorizationEndpointURL) else { return nil }
+
+    urlComponents.queryItems = [
+      URLQueryItem(name: "client_id", value: clientId),
+      URLQueryItem(name: "code_challenge", value: codeChallenge),
+      URLQueryItem(name: "code_challenge_method", value: "S256"),
+      URLQueryItem(name: "access_type", value: "offline"),
+      URLQueryItem(name: "redirect_uri", value: redirectURI),
+      URLQueryItem(name: "response_type", value: "code"),
+      URLQueryItem(name: "scope", value: "openid+profile+https://www.googleapis.com/auth/userinfo.profile")
+    ]
+
+    return urlComponents.url
+  }
+
+  // MARK: Token
+  /// Generates a `URLRequest` for the token exchange
+  /// https://datatracker.ietf.org/doc/html/rfc7636#section-4.5
+  func createTokenExchangeURLRequest(code: String, codeVerifier: String) -> URLRequest? {
+    var urlRequest = createURLRequestForTokenEndpoint()
+    urlRequest?.httpBody = createTokenExchangeRequestData(code: code, codeVerifier: codeVerifier)
+    return urlRequest
+  }
+
+  func createRefreshTokenURLRequest(refreshToken: String) -> URLRequest? {
+    var urlRequest = createURLRequestForTokenEndpoint()
+    urlRequest?.httpBody = createRefreshTokenRequestData(refreshToken: refreshToken)
+    return urlRequest
+  }
+
+  private func createURLRequestForTokenEndpoint() -> URLRequest? {
+    guard let tokenEndpointURL = URL(string: tokenEndpointURL) else { return nil }
+
+    var urlRequest = URLRequest(url: tokenEndpointURL)
+    urlRequest.httpMethod = "POST"
+    urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+    return urlRequest
+  }
+
+  private func createTokenExchangeRequestData(code: String, codeVerifier: String) -> Data? {
+    var urlComponents = URLComponents()
+
+    urlComponents.queryItems = [
+      URLQueryItem(name: "grant_type", value: "authorization_code"),
+      URLQueryItem(name: "client_id", value: clientId),
+      URLQueryItem(name: "code", value: code),
+      URLQueryItem(name: "code_verifier", value: codeVerifier),
+      URLQueryItem(name: "redirect_uri", value: redirectURI)
+    ]
+
+    return urlComponents.query?.data(using: .utf8)
+  }
+
+  private func createRefreshTokenRequestData(refreshToken: String) -> Data? {
+    var urlComponents = URLComponents()
+
+    urlComponents.queryItems = [
+      URLQueryItem(name: "grant_type", value: "refresh_token"),
+      URLQueryItem(name: "client_id", value: clientId),
+      URLQueryItem(name: "refresh_token", value: refreshToken)
+    ]
+
+    return urlComponents.query?.data(using: .utf8)
+  }
+}
+
+extension PKCERequestBuilder {
+  // TODO: Replace clientID with ID from Google
+  static let myGoogleInfo = PKCERequestBuilder(
+    authorizationEndpointURL: "https://accounts.google.com/o/oauth2/v2/auth",
+    tokenEndpointURL: "https://oauth2.googleapis.com/token",
+    clientId: "REPLACE_WITH_CLIENTID_FROM_GOOGLE_APP",
+    // swiftlint:disable:next force_unwrapping
+    redirectURI: "\(Bundle.main.bundleIdentifier!):/oauth2callback"
+  )
+}
+```
+🫖 Note:
+According to the RFC, the client should communicate with these two endpoints with two different HTTP request types:
+
+Using a GET with all the required parameters passed as URL parameters, for the authorization endpoint.
+Sending a POST with the parameters passed in the request’s body, encoded as URL parameters, for the token endpoint.
