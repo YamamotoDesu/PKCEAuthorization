@@ -215,3 +215,5 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 * Finally, click CREATE. You should have an OAuth client definition for iOS as in the picture below:
 ![image](https://user-images.githubusercontent.com/47273077/224525597-89d8b3f0-d092-4d1b-845f-fef075ad07b5.png)
 
+* Replace REPLACE_WITH_CLIENTID_FROM_GOOGLE_APP in the definition below with the Client ID from your Google app in PKCERequestBuilder.
+![image](https://user-images.githubusercontent.com/47273077/224525620-1ea84c29-3cfa-4f8e-9b8a-e8d198fa763d.png)
