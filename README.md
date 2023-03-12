@@ -217,3 +217,58 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 
 * Replace REPLACE_WITH_CLIENTID_FROM_GOOGLE_APP in the definition below with the Client ID from your Google app in PKCERequestBuilder.
 ![image](https://user-images.githubusercontent.com/47273077/224525620-1ea84c29-3cfa-4f8e-9b8a-e8d198fa763d.png)
+
+### Authenticating the User
+
+```swift
+  func startAuthentication() {
+    print("[Debug] Start the authentication flow")
+    status = .authenticating
+    
+    // 1
+    let codeVerifier = PKCECodeGenerator.generateCodeVerifier()
+    guard
+      let codeChallenge = PKCECodeGenerator.generateCodeChallenge(
+        codeVerifier: codeVerifier
+      ),
+      // 2
+      let authenticationURL = requestBuilder.createAuthorizationRequestURL(
+        codeChallenge: codeChallenge
+      )
+    else {
+      print("[Error] Can't build authentication URL!")
+      status = .error(error: .internalError)
+      return
+    }
+    print("[Debug] Authentication with: \(authenticationURL.absoluteString)")
+    guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+      print("[Error] Bundle Identifier is nil!")
+      status = .error(error: .internalError)
+      return
+    }
+    // 3
+    let session = ASWebAuthenticationSession(
+      url: authenticationURL,
+      callbackURLScheme: bundleIdentifier
+    ) { callbackURL, error in
+      // 4
+      self.handleAuthenticationResponse(
+        callbackURL: callbackURL,
+        error: error,
+        codeVerifier: codeVerifier
+      )
+    }
+    // 5
+    session.presentationContextProvider = self
+    // 6
+    session.start()
+
+  }
+  ```
+  
+  ### You’ll see an alert saying MyGoogleInfo wants to use google.com to sign in
+  ![image](https://user-images.githubusercontent.com/47273077/224526608-9420288c-92dd-450f-b263-261314cf3d9a.png)
+  
+  ## Tap Continue and you’ll see the Google login screen
+  ![image](https://user-images.githubusercontent.com/47273077/224526610-4bf596e5-7284-41ad-a8ef-25f8a93b0d0c.png)
+
