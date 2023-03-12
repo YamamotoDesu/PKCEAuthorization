@@ -195,3 +195,6 @@ According to the RFC, the client should communicate with these two endpoints wit
 
 Using a GET with all the required parameters passed as URL parameters, for the authorization endpoint.
 Sending a POST with the parameters passed in the request’s body, encoded as URL parameters, for the token endpoint.
+
+## 🌝Preparing Server Side (Google Cloud Platform)
+
