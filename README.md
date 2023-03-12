@@ -271,6 +271,5 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 
   
 ## Tap Continue and you’ll see the Google login screen
-![image](https://user-images.githubusercontent.com/47273077/224526610-4bf596e5-7284-41ad-a8ef-
 <img width="300" alt="スクリーンショット 2023-03-12 14 47 38" src="https://user-images.githubusercontent.com/47273077/224526809-01bbc74a-61fe-408f-b95d-ddf15e2e181b.png">
 
