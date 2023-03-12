@@ -48,3 +48,43 @@ Once the attacker knows the client ID and the grant code, they can request a tok
 [7] The client sends the code_verifier when requesting an access token.
 
 [8] Therefore, the authorization server verifies that code_verifier matches code_challenge. If these two codes match, the server knows the client is legit and emits the token.
+
+------
+PKCECodeGenerator
+```swift
+import Foundation
+import CryptoKit
+
+enum PKCECodeGenerator {
+  /// Generate a random code as specified in
+  /// https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
+  static func generateCodeVerifier() -> String {
+    // TODO: Generate code_verifier
+    // 1
+    var buffer = [UInt8](repeating: 0, count: 32)
+    _ = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
+    // 2
+    return Data(buffer).base64URLEncodedString()
+  }
+
+  /// Generate a code challenge from a code verifier as specified in
+  /// https://datatracker.ietf.org/doc/html/rfc7636#section-4.2
+  static func generateCodeChallenge(codeVerifier: String) -> String? {
+    // TODO: Generate code_challenge
+    guard let data = codeVerifier.data(using: .utf8) else { return nil }
+
+    let dataHash = SHA256.hash(data: data)
+    return Data(dataHash).base64URLEncodedString()
+  }
+}
+
+private extension Data {
+  func base64URLEncodedString() -> String {
+    base64EncodedString()
+      .replacingOccurrences(of: "+", with: "-")
+      .replacingOccurrences(of: "/", with: "_")
+      .replacingOccurrences(of: "=", with: "")
+      .trimmingCharacters(in: .whitespaces)
+  }
+}
+```
