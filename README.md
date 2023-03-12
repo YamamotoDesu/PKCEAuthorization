@@ -198,3 +198,9 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 
 ## 🌝Preparing Server Side (Google Cloud Platform)
 
+### Enabling the Required API
+* Enable the Google People API to allow the app to query the user information
+![image](https://user-images.githubusercontent.com/47273077/224525276-98d93d41-fd90-4dad-bbb1-cf4a3fd1a2bf.png)
+
+* Then, search for Google People API and click ENABLE.
+![image](https://user-images.githubusercontent.com/47273077/224525294-eea4e87d-07b8-4354-8f38-6bf46481ffa6.png)
