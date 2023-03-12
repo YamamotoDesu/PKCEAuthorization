@@ -22,6 +22,8 @@ https://www.kodeco.com/33091327-dissect-the-pkce-authorization-code-grant-flow-o
 
 [8] Finally, the client accesses the data to the resource server, authenticating its requests with the token.
 
+### 💀Attacking the Authorization Code Grant Flow
+
 Although the authorization code grant flow is the way to go for mobile apps, it’s subject to client impersonation attacks. A malicious app can impersonate a legitimate client and receive a valid authentication token to access the user data.
 
 For the flow diagram above, to receive a token the attacker should know these two parameters:
@@ -31,6 +33,8 @@ The code received in the callback URL from the authorization token.
 Under certain circumstances, a malicious app can recover both. The app’s client ID is usually hardcoded, for example, and an attacker could find it by reverse-engineering the app. Or, by registering the malicious app as a legitimate invoker of the callback URL, the attacker can also sniff the callback URL.
 
 Once the attacker knows the client ID and the grant code, they can request a token to the token endpoint. From that point forward, they use the access token to retrieve data illegally.
+
+-----
 
 ### The following diagram depicts how PKCE strengthens the Authorization Code Grant flow in practice:
 ![image](https://user-images.githubusercontent.com/47273077/224521025-b35a8707-8dd9-4836-90ec-7831c24a7921.png)
