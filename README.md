@@ -266,9 +266,11 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
   }
   ```
   
-  ### You’ll see an alert saying MyGoogleInfo wants to use google.com to sign in
-  ![image](https://user-images.githubusercontent.com/47273077/224526608-9420288c-92dd-450f-b263-261314cf3d9a.png)
+### You’ll see an alert saying MyGoogleInfo wants to use google.com to sign in
+<img width="300" alt="スクリーンショット 2023-03-12 14 47 01" src="https://user-images.githubusercontent.com/47273077/224526780-0c213bdf-284b-421e-b943-d5fe1a0063cc.png">
+
   
-  ## Tap Continue and you’ll see the Google login screen
-  ![image](https://user-images.githubusercontent.com/47273077/224526610-4bf596e5-7284-41ad-a8ef-25f8a93b0d0c.png)
+## Tap Continue and you’ll see the Google login screen
+![image](https://user-images.githubusercontent.com/47273077/224526610-4bf596e5-7284-41ad-a8ef-
+<img width="300" alt="スクリーンショット 2023-03-12 14 47 38" src="https://user-images.githubusercontent.com/47273077/224526809-01bbc74a-61fe-408f-b95d-ddf15e2e181b.png">
 
