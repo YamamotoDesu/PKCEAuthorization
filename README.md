@@ -208,5 +208,9 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 ### Generating the Authorization Credentials
 * Click CREATE CREDENTIALS, then choose OAuth Client ID
 ![image](https://user-images.githubusercontent.com/47273077/224525379-9791fa93-c186-4828-a541-f42a818c8687.png)
+
 * Fill in the required fields as shown in the figure below.
 ![image](https://user-images.githubusercontent.com/47273077/224525569-75f12819-96ee-4910-92da-194134c709da.png)
+
+* Finally, click CREATE. You should have an OAuth client definition for iOS as in the picture below:
+
