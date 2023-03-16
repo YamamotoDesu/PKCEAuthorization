@@ -273,3 +273,37 @@ Sending a POST with the parameters passed in the request’s body, encoded as UR
 ## Tap Continue and you’ll see the Google login screen
 <img width="300" alt="スクリーンショット 2023-03-12 14 47 38" src="https://user-images.githubusercontent.com/47273077/224526809-01bbc74a-61fe-408f-b95d-ddf15e2e181b.png">
 
+## Getting the Access Token
+```swift
+do {
+  // 1
+  let (data, response) = try await URLSession.shared.data(for: tokenURLRequest)
+  // 2
+  guard let response = response as? HTTPURLResponse else {
+    print("[Error] HTTP response parsing failed!")
+    status = .error(error: .tokenExchangeFailed)
+    return
+  }
+  guard response.isOk else {
+    let body = String(data: data, encoding: .utf8) ?? "EMPTY"
+    print("[Error] Get token failed with status: \(response.statusCode), body: \(body)")
+    status = .error(error: .tokenExchangeFailed)
+    return
+  }
+  print("[Debug] Get token response: \(String(data: data, encoding: .utf8) ?? "EMPTY")")
+  // 3
+  let decoder = JSONDecoder()
+  decoder.keyDecodingStrategy = .convertFromSnakeCase
+  let token = try decoder.decode(GoogleToken.self, from: data)
+  // TODO: Store the token in the Keychain
+  // 4
+  status = .authenticated(token: token)
+} catch {
+  print("[Error] Get token failed with: \(error.localizedDescription)")
+status = .error(error: .tokenExchangeFailed)
+}
+```
+
+![image](https://user-images.githubusercontent.com/47273077/225522496-b8911fb1-5f77-449f-9709-90d5220ed780.png)
+
+  
