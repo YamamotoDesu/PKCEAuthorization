@@ -38,14 +38,21 @@ enum PKCECodeGenerator {
   /// https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
   static func generateCodeVerifier() -> String {
     // TODO: Generate code_verifier
-    return ""
+    // 1
+    var buffer = [UInt8](repeating: 0, count: 32)
+    _ = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
+    // 2
+    return Data(buffer).base64URLEncodedString()
   }
 
   /// Generate a code challenge from a code verifier as specified in
   /// https://datatracker.ietf.org/doc/html/rfc7636#section-4.2
   static func generateCodeChallenge(codeVerifier: String) -> String? {
     // TODO: Generate code_challenge
-    return ""
+    guard let data = codeVerifier.data(using: .utf8) else { return nil }
+
+    let dataHash = SHA256.hash(data: data)
+    return Data(dataHash).base64URLEncodedString()
   }
 }
 

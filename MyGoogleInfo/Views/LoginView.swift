@@ -41,7 +41,7 @@ struct LoginView: View {
     VStack(spacing: 32) {
       Image(systemName: "person.crop.square.fill")
         .resizable()
-        .symbolRenderingMode(.monochrome)
+//        .symbolRenderingMode(.monochrome)
         .foregroundColor(.accentColor)
         .frame(width: 100, height: 100, alignment: .center)
 

@@ -114,7 +114,7 @@ extension PKCERequestBuilder {
   static let myGoogleInfo = PKCERequestBuilder(
     authorizationEndpointURL: "https://accounts.google.com/o/oauth2/v2/auth",
     tokenEndpointURL: "https://oauth2.googleapis.com/token",
-    clientId: "REPLACE_WITH_CLIENTID_FROM_GOOGLE_APP",
+    clientId: "624918663274-9f16joa2338p8nljf8q3pcsbba929mol.apps.googleusercontent.com",
     // swiftlint:disable:next force_unwrapping
     redirectURI: "\(Bundle.main.bundleIdentifier!):/oauth2callback"
   )

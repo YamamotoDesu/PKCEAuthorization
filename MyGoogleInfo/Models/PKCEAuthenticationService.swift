@@ -69,6 +69,45 @@ class PKCEAuthenticationService: NSObject, ObservableObject {
   func startAuthentication() {
     print("[Debug] Start the authentication flow")
     status = .authenticating
+    
+    // 1
+    let codeVerifier = PKCECodeGenerator.generateCodeVerifier()
+    guard
+      let codeChallenge = PKCECodeGenerator.generateCodeChallenge(
+        codeVerifier: codeVerifier
+      ),
+      // 2
+      let authenticationURL = requestBuilder.createAuthorizationRequestURL(
+        codeChallenge: codeChallenge
+      )
+    else {
+      print("[Error] Can't build authentication URL!")
+      status = .error(error: .internalError)
+      return
+    }
+    print("[Debug] Authentication with: \(authenticationURL.absoluteString)")
+    guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+      print("[Error] Bundle Identifier is nil!")
+      status = .error(error: .internalError)
+      return
+    }
+    // 3
+    let session = ASWebAuthenticationSession(
+      url: authenticationURL,
+      callbackURLScheme: bundleIdentifier
+    ) { callbackURL, error in
+      // 4
+      self.handleAuthenticationResponse(
+        callbackURL: callbackURL,
+        error: error,
+        codeVerifier: codeVerifier
+      )
+    }
+    // 5
+    session.presentationContextProvider = self
+    // 6
+    session.start()
+
   }
 
   private func handleAuthenticationResponse(callbackURL: URL?, error: Error?, codeVerifier: String) {
@@ -78,6 +117,15 @@ class PKCEAuthenticationService: NSObject, ObservableObject {
       return
     }
     print("[Debug] Received callback URL: \(callbackURL?.absoluteString ?? "EMPTY")")
+    
+    guard let code = extractCodeFromCallbackURL(callbackURL) else {
+      status = .error(error: .authenticationFailed)
+      return
+    }
+    
+    Task {
+      await getToken(code: code, codeVerifier: codeVerifier)
+    }
   }
 
   private func extractCodeFromCallbackURL(_ callbackURL: URL?) -> String? {
@@ -97,6 +145,47 @@ class PKCEAuthenticationService: NSObject, ObservableObject {
     }
 
     return code
+  }
+  
+  private func getToken(code: String, codeVerifier: String) async {
+    guard let tokenURLRequest = requestBuilder.createTokenExchangeURLRequest(
+      code: code,
+      codeVerifier: codeVerifier
+    ) else {
+      print("[Error] Can't build token exchange URL!")
+      status = .error(error: .internalError)
+      return
+    }
+    let tokenURLRequestBody = tokenURLRequest.httpBody ?? Data()
+      print("[Debug] Get token parameters: \(String(data: tokenURLRequestBody, encoding: .utf8) ?? "")")
+    do {
+      let (data, response) = try await URLSession.shared.data(for: tokenURLRequest)
+
+      guard let response = response as? HTTPURLResponse else {
+        print("[Error] HTTP response parsing failed!")
+        status = .error(error: .tokenExchangeFailed)
+        return
+      }
+
+      guard response.isOk else {
+        let body = String(data: data, encoding: .utf8) ?? "EMPTY"
+        print("[Error] Get token failed with status: \(response.statusCode), body: \(body)")
+        status = .error(error: .tokenExchangeFailed)
+        return
+      }
+
+      print("[Debug] Get token response: \(String(data: data, encoding: .utf8) ?? "EMPTY")")
+
+      let decoder = JSONDecoder()
+      decoder.keyDecodingStrategy = .convertFromSnakeCase
+      let token = try decoder.decode(GoogleToken.self, from: data)
+
+      // TODO: Store the token in the Keychain
+      status = .authenticated(token: token)
+    } catch {
+      print("[Error] Get token failed with: \(error.localizedDescription)")
+      status = .error(error: .tokenExchangeFailed)
+    }
   }
 }
 
